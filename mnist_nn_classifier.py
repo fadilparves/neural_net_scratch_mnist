@@ -23,11 +23,11 @@ def read_data(images_path, labels_path):
     
     return images, labels
 
-def plot_error(model):
+def plot_error(model, name):
     plt.plot(range(len(model.error_)), model.error_)
     plt.ylabel('Error')
     plt.xlabel('Epochs')
-    plt.show()
+    plt.savefig('./output/'+name)
 
 def plot_image(i, predictions_array, true_labels, images):
   predictions_array, true_label, img = predictions_array[i], true_labels[i], images[i]
@@ -72,4 +72,9 @@ def plot_image_grid(X_test, y_test, y_hat, num_rows=5, num_cols=3):
 X, y = read_data('./data/train-images-idx3-ubyte', './data/train-labels-idx1-ubyte')
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-print(X[1])
+nn = NNClassificationModel(n_classes=10, n_features=28*28, n_hidden_units=50,
+                            l2=0.5, l1=0.0, epochs=1000, learning_rate=0.001,
+                            n_batches=25, random_seed=42)
+
+nn.fit(X_train, y_train)
+
