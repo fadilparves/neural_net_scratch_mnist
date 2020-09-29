@@ -25,4 +25,23 @@ class NNClassificationModel:
     
     #Training part
     def fit(self, X, y):
+        self.error_ = []
+        X_data, y_data = X.copy(), y.copy()
+        y_data_enc = one_hot(y_data, self.n_classes)
+
+        X_mbs = np.array_split(X_data, self.n_batches)
+        y_mbs = np.array_split(y_data_enc, self.n_batches)
+
+        for i in range(self.epochs):
+            epoch_errors = []
+
+            for Xi, yi in zip(X_mbs, y_mbs):
+                #Update the weights
+                error, grad1, grad2 = self._backprop_step(Xi, yi)
+                epoch_errors.append(error)
+                self.w1 -= self.learning_rate * grad1
+                self.w2 -= self.learning_rate * grad2
+            
+            self.error_.append(np.mean(epoch_errors))
         
+        return self
