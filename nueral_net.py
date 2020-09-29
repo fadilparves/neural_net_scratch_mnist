@@ -45,3 +45,16 @@ class NNClassificationModel:
             self.error_.append(np.mean(epoch_errors))
         
         return self
+
+    def _backprop_step(self, X, y):
+        net_input, net_hidden, act_hidden, net_out, act_out = self._forward(X)
+        y = y.T
+
+        grad1 , grad2 = self._backward(net_input, net_hidden, act_hidden, act_out, y)
+
+        grad1 += self.w1 * (self.l1 + self.l2)
+        grad2 += self.w2 * (self.l1 + self.l2)
+
+        error = self._error(y, act_out)
+
+        return error, grad1, grad2
