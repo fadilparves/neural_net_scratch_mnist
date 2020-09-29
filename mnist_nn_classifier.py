@@ -5,6 +5,7 @@ from pylab import rcParams
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 import struct
+from sklearn.preprocessing import scale
 from nueral_net import NNClassificationModel
 
 sns.set(style='whitegrid', palette='muted', font_scale=1.5)
@@ -78,3 +79,21 @@ nn = NNClassificationModel(n_classes=10, n_features=28*28, n_hidden_units=50,
 
 nn.fit(X_train, y_train)
 
+plot_error(nn, 'without_scaled.png')
+
+print('Train Accuracy: %.2f%%' % (nn.score(X_train, y_train) * 100))
+print('Test Accuracy: %.2f%%' % (nn.score(X_test, y_test) * 100))
+
+X_train_scaled = scale(X_train.astype(np.float64))
+X_test_scaled = scale(X_test.astype(np.float64))
+
+nn.fit(X_train_scaled, y_train)
+
+plot_error(nn, 'with_scaled.png')
+
+print('Train Accuracy Scaled: %.2f%%' % (nn.score(X_train_scaled, y_train) * 100))
+print('Test Accuracy Scaled: %.2f%%' % (nn.score(X_test_scaled, y_test) * 100))
+
+y_hat = nn.predict_proba(X_test_scaled)
+
+plot_image_grid(X_test, y_test, y_hat)

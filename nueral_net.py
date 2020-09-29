@@ -1,6 +1,7 @@
 import numpy as np
 import math
 import struct
+from scipy.special import expit
 
 class NNClassificationModel:
 
@@ -36,7 +37,7 @@ class NNClassificationModel:
         return (np.exp(inp.T) / np.sum(np.exp(inp), axis=1)).T
 
     def sigmoid(self, inp):
-        return 1.0 / (1.0 + np.exp(-inp))
+        return expit(inp)
 
     def sigmoid_prime(self, inp):
         sg = self.sigmoid(inp)
@@ -96,7 +97,7 @@ class NNClassificationModel:
 
         for i in range(self.epochs):
             epoch_errors = []
-
+            
             for Xi, yi in zip(X_mbs, y_mbs):
                 #Update the weights
                 error, grad1, grad2 = self._backprop_step(Xi, yi)
@@ -105,6 +106,7 @@ class NNClassificationModel:
                 self.w2 -= self.learning_rate * grad2
             
             self.error_.append(np.mean(epoch_errors))
+            print("EPOCH %s --- Error (%s)" %(i, np.mean(epoch_errors)))
         
         return self
 
