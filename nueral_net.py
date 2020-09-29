@@ -55,7 +55,7 @@ class NNClassificationModel:
         L1_term = self.L1_reg(self.l1, self.w1, self.w2)
         L2_term = self.L2_reg(self.l2, self.w1, self.w2)
         error = self.cross_entropy(output, y) + L1_term + L2_term
-        retrun 0.5 * np.mean(error)
+        return 0.5 * np.mean(error)
 
     def _forward(self, X):
         net_input = X.copy()

@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import seaborn as sns
 from pylab import rcParams
 import matplotlib.pyplot as plt
@@ -67,3 +68,8 @@ def plot_image_grid(X_test, y_test, y_hat, num_rows=5, num_cols=3):
     plot_image(i, y_hat, y_test, X_test)
     plt.subplot(num_rows, 2*num_cols, 2*i+2)
     plot_value_array(i, y_hat,  y_test)
+
+X, y = read_data('./data/train-images-idx3-ubyte', './data/train-labels-idx1-ubyte')
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+print(X[1])
