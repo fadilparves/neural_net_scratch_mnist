@@ -46,10 +46,10 @@ class NNClassificationModel:
     def cross_entropy(self, outputs, y_target):
         return -np.sum(np.log(outputs) * y_target, axis=1)
 
-    def L1_reg(self, lambda_, w1, w2):
+    def L2_reg(self, lambda_, w1, w2):
         return(lambda_ / 2.0) * (np.sum(w1 ** 2) + np.sum(w2 ** 2))
 
-    def L2_reg(self, lambda_, w1, w2):
+    def L1_reg(self, lambda_, w1, w2):
         return(lambda_ / 2.0) * (np.abs(w2).sum() + np.abs(w2).sum())
 
     def _error(self, y, output):
@@ -79,8 +79,8 @@ class NNClassificationModel:
 
         grad1 , grad2 = self._backward(net_input, net_hidden, act_hidden, act_out, y)
 
-        grad1 += self.w1 * (self.l1 + self.l2)
-        grad2 += self.w2 * (self.l1 + self.l2)
+        grad1 += (self.w1 * (self.l1 + self.l2))
+        grad2 += (self.w2 * (self.l1 + self.l2))
 
         error = self._error(y, act_out)
 
@@ -102,8 +102,8 @@ class NNClassificationModel:
                 #Update the weights
                 error, grad1, grad2 = self._backprop_step(Xi, yi)
                 epoch_errors.append(error)
-                self.w1 -= self.learning_rate * grad1
-                self.w2 -= self.learning_rate * grad2
+                self.w1 -= (self.learning_rate * grad1)
+                self.w2 -= (self.learning_rate * grad2)
             
             self.error_.append(np.mean(epoch_errors))
             print("EPOCH %s --- Error (%s)" %(i, np.mean(epoch_errors)))

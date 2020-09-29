@@ -74,7 +74,7 @@ X, y = read_data('./data/train-images-idx3-ubyte', './data/train-labels-idx1-uby
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 nn = NNClassificationModel(n_classes=10, n_features=28*28, n_hidden_units=50,
-                            l2=0.5, l1=0.0, epochs=1000, learning_rate=0.001,
+                            l2=0.5, l1=0.0, epochs=300, learning_rate=0.001,
                             n_batches=25, random_seed=42)
 
 nn.fit(X_train, y_train)
