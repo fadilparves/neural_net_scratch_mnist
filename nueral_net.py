@@ -23,6 +23,12 @@ class NNClassificationModel:
 
         return w1, w2
 
+    def one_hot(self, y, n_labels):
+        mat = np.zeros((len(y), n_labels))
+        for i, val in enumerate(y):
+            mat[i, val] = 1
+        return mat
+
     def mle(self, y, axis=1):
         return np.argmax(y, axis)
 
@@ -83,7 +89,7 @@ class NNClassificationModel:
     def fit(self, X, y):
         self.error_ = []
         X_data, y_data = X.copy(), y.copy()
-        y_data_enc = one_hot(y_data, self.n_classes)
+        y_data_enc = self.one_hot(y_data, self.n_classes)
 
         X_mbs = np.array_split(X_data, self.n_batches)
         y_mbs = np.array_split(y_data_enc, self.n_batches)
