@@ -22,6 +22,62 @@ class NNClassificationModel:
         w2 = np.random.uniform(-1.0, 1.0, size=(self.n_classes, self.n_hidden_units))
 
         return w1, w2
+
+    def mle(self, y, axis=1):
+        return np.argmax(y, axis)
+
+    def softmax(self, inp):
+        return (np.exp(inp.T) / np.sum(np.exp(inp), axis=1)).T
+
+    def sigmoid(self, inp):
+        return 1.0 / (1.0 + np.exp(-inp))
+
+    def sigmoid_prime(self, inp):
+        sg = self.sigmoid(inp)
+        return sg * (1 - sg)
+
+    def cross_entropy(self, outputs, y_target):
+        return -np.sum(np.log(outputs) * y_target, axis=1)
+
+    def L1_reg(self, lambda_, w1, w2):
+        return(lambda_ / 2.0) * (np.sum(w1 ** 2) + np.sum(w2 ** 2))
+
+    def L2_reg(self, lambda_, w1, w2):
+        return(lambda_ / 2.0) * (np.abs(w2).sum() + np.abs(w2).sum())
+
+    def _error(self, y, output):
+        L1_term = self.L1_reg(self.l1, self.w1, self.w2)
+        L2_term = self.L2_reg(self.l2, self.w1, self.w2)
+        error = self.cross_entropy(output, y) + L1_term + L2_term
+        retrun 0.5 * np.mean(error)
+
+    def _forward(self, X):
+        net_input = X.copy()
+        net_hidden = self.w1.dot(net_input.T)
+        act_hidden = self.sigmoid(net_hidden)
+        net_out = self.w2.dot(act_hidden)
+        act_out = self.sigmoid(net_out)
+        return net_input, net_hidden, act_hidden, net_out, act_out
+
+    def _backward(self, net_input, net_hidden, act_hidden, act_out, y):
+        sigma3 = act_out - y
+        sigma2 = self.w2.T.dot(sigma3) * self.sigmoid_prime(net_hidden)
+        grad1 = sigma2.dot(net_input)
+        grad2 = sigma3.dot(act_hidden.T)
+        return grad1, grad2
+
+    def _backprop_step(self, X, y):
+        net_input, net_hidden, act_hidden, net_out, act_out = self._forward(X)
+        y = y.T
+
+        grad1 , grad2 = self._backward(net_input, net_hidden, act_hidden, act_out, y)
+
+        grad1 += self.w1 * (self.l1 + self.l2)
+        grad2 += self.w2 * (self.l1 + self.l2)
+
+        error = self._error(y, act_out)
+
+        return error, grad1, grad2
     
     #Training part
     def fit(self, X, y):
@@ -46,60 +102,16 @@ class NNClassificationModel:
         
         return self
 
-    def _backprop_step(self, X, y):
-        net_input, net_hidden, act_hidden, net_out, act_out = self._forward(X)
-        y = y.T
-
-        grad1 , grad2 = self._backward(net_input, net_hidden, act_hidden, act_out, y)
-
-        grad1 += self.w1 * (self.l1 + self.l2)
-        grad2 += self.w2 * (self.l1 + self.l2)
-
-        error = self._error(y, act_out)
-
-        return error, grad1, grad2
-
-    def _forward(self, X):
-        net_input = X.copy()
-        net_hidden = self.w1.dot(net_input.T)
-        act_hidden = self.sigmoid(net_hidden)
-        net_out = self.w2.dot(act_hidden)
-        act_out = self.sigmoid(net_out)
-        return net_input, net_hidden, act_hidden, net_out, act_out
-
-    def _backward(self, net_input, net_hidden, act_hidden, act_out, y):
-        sigma3 = act_out - y
-        sigma2 = self.w2.T.dot(sigma3) * self.sigmoid_prime(net_hidden)
-        grad1 = sigma2.dot(net_input)
-        grad2 = sigma3.dot(act_hidden.T)
-        return grad1, grad2
-
-    def sigmoid(self, inp):
-        return 1.0 / (1.0 + np.exp(-inp))
-
-    def sigmoid_prime(self, inp):
-        sg = self.sigmoid(inp)
-        return sg * (1 - sg)
-
-    def cross_entropy(self, outputs, y_target):
-        return -np.sum(np.log(outputs) * y_target, axis=1)
-
-    def _error(self, y, output):
-        L1_term = self.L1_reg(self.l1, self.w1, self.w2)
-        L2_term = self.L2_reg(self.l2, self.w1, self.w2)
-        error = self.cross_entropy(output, y) + L1_term + L2_term
-        retrun 0.5 * np.mean(error)
-
-    def L1_reg(self, lambda_, w1, w2):
-        return(lambda_ / 2.0) * (np.sum(w1 ** 2) + np.sum(w2 ** 2))
-
-    def L2_reg(self, lambda_, w1, w2):
-        return(lambda_ / 2.0) * (np.abs(w2).sum() + np.abs(w2).sum())
-
     def predict(self, X):
         Xt = X.copy()
         _, _, _, net_out, _ = self._forward(Xt)
         return self.mle(net_out.T)
 
-    def mle(self, y, axis=1):
-        return np.argmax(y, axis)
+    def _predict_proba(self, X):
+        Xt = X.copy()
+        _, _, _, _, act_out = self._forward(Xt)
+        return self.softmax(act_out.T)
+
+    def score(self, X, y):
+        y_hat = self.predict(X)
+        return np.sum(y == y_hat, axis=0) / float(X.shape[0])
