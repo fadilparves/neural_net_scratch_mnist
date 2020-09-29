@@ -80,3 +80,12 @@ class NNClassificationModel:
     def sigmoid_prime(self, inp):
         sg = self.sigmoid(inp)
         return sg * (1 - sg)
+
+    def cross_entropy(self, outputs, y_target):
+        return -np.sum(np.log(outputs) * y_target, axis=1)
+
+    def _error(self, y, output):
+        L1_term = L1_reg(self.l1, self.w1, self.w2)
+        L2_term = L2_reg(self.l2, self.w1, self.w2)
+        error = self.cross_entropy(output, y) + L1_term + L2_term
+        retrun 0.5 * np.mean(error)
