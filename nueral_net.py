@@ -85,7 +85,14 @@ class NNClassificationModel:
         return -np.sum(np.log(outputs) * y_target, axis=1)
 
     def _error(self, y, output):
-        L1_term = L1_reg(self.l1, self.w1, self.w2)
-        L2_term = L2_reg(self.l2, self.w1, self.w2)
+        L1_term = self.L1_reg(self.l1, self.w1, self.w2)
+        L2_term = self.L2_reg(self.l2, self.w1, self.w2)
         error = self.cross_entropy(output, y) + L1_term + L2_term
         retrun 0.5 * np.mean(error)
+
+    def L1_reg(self, lambda_, w1, w2):
+        return(lambda_ / 2.0) * (np.sum(w1 ** 2) + np.sum(w2 ** 2))
+
+    def L2_reg(self, lambda_, w1, w2):
+        return(lambda_ / 2.0) * (np.abs(w2).sum() + np.abs(w2).sum())
+
