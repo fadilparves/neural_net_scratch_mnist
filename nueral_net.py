@@ -62,14 +62,21 @@ class NNClassificationModel:
     def _forward(self, X):
         net_input = X.copy()
         net_hidden = self.w1.dot(net_input.T)
-        act_hidden = sigmoid(net_hidden)
+        act_hidden = self.sigmoid(net_hidden)
         net_out = self.w2.dot(act_hidden)
-        act_out = sigmoid(net_out)
+        act_out = self.sigmoid(net_out)
         return net_input, net_hidden, act_hidden, net_out, act_out
 
     def _backward(self, net_input, net_hidden, act_hidden, act_out, y):
         sigma3 = act_out - y
-        sigma2 = self.w2.T.dot(sigma3) * sigmoid_prime(net_hidden)
+        sigma2 = self.w2.T.dot(sigma3) * self.sigmoid_prime(net_hidden)
         grad1 = sigma2.dot(net_input)
         grad2 = sigma3.dot(act_hidden.T)
         return grad1, grad2
+
+    def sigmoid(self, inp):
+        return 1.0 / (1.0 + np.exp(-inp))
+
+    def sigmoid_prime(self, inp):
+        sg = self.sigmoid(inp)
+        return sg * (1 - sg)
