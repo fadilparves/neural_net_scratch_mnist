@@ -96,3 +96,10 @@ class NNClassificationModel:
     def L2_reg(self, lambda_, w1, w2):
         return(lambda_ / 2.0) * (np.abs(w2).sum() + np.abs(w2).sum())
 
+    def predict(self, X):
+        Xt = X.copy()
+        _, _, _, net_out, _ = self._forward(Xt)
+        return self.mle(net_out.T)
+
+    def mle(self, y, axis=1):
+        return np.argmax(y, axis)
