@@ -16,3 +16,13 @@ class NNClassificationModel:
         self.epochs = epochs
         self.learning_rate = learning_rate
         self.n_batches = n_batches
+
+    def _init_weights(self):
+        w1 = np.random.uniform(-1.0, 1.0, size=(self.n_hidden_units, self.n_features))
+        w2 = np.random.uniform(-1.0, 1.0, size=(self.n_classes, self.n_hidden_units))
+
+        return w1, w2
+    
+    #Training part
+    def fit(self, X, y):
+        
