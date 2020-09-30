@@ -115,7 +115,7 @@ class NNClassificationModel:
         _, _, _, net_out, _ = self._forward(Xt)
         return self.mle(net_out.T)
 
-    def _predict_proba(self, X):
+    def predict_proba(self, X):
         Xt = X.copy()
         _, _, _, _, act_out = self._forward(Xt)
         return self.softmax(act_out.T)
